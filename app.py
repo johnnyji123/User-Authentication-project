@@ -1,8 +1,11 @@
 import mysql.connector
 from flask import Flask, render_template, flash, redirect, url_for
 from flask import request
+from flask_mail import Mail
+from flask_mail import Message
 import random
 import string
+
 
 db = mysql.connector.connect(
     
@@ -19,6 +22,7 @@ cursor = db.cursor()
 
 app = Flask(__name__)
 app.secret_key = "123123123"
+mail = Mail(app)
 
 @app.route("/" , methods = ["GET", "POST"])
 def login_user():
@@ -47,15 +51,23 @@ def register_user():
     email = request.form.get("Email")
     password = request.form.get("Password")
     
+    msg = Message("Please verify your email", sender = "jj_sasuke@hotmail.co.uk", recipient = email)
+    msg.body = f"http://127.0.0.1:5000/{random_token}"
+    mail.send(msg)
+    
     cursor.execute("INSERT INTO user_info (Name, Email, Password, Token) VALUES (%s, %s, %s, %s)",
                   (name, email, password, random_token) )
+        
     
-    return redirect("/")
+    
+    return render_template("register_user.html")
 
-
-
+@app.route("/verify_email/<token>", methods = ["GET", "POST"])
+def email_verification(token):
+        
+    return render_template("verify_email.html")
         
 
-#if __name__ == "__main__":
-    #app.run(debug= True, use_reloader = False)
+if __name__ == "__main__":
+    app.run(debug= True, use_reloader = False)
 
