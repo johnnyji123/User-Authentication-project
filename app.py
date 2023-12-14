@@ -21,21 +21,19 @@ cursor = db.cursor()
 # table user_info
 
 app = Flask(__name__)
-app.secret_key = "123123123"
-
-
+app.config['SECRET_KEY'] = "123123123"
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
-app.config['MAIL_USERNAME'] = 'sendcrypto123456@gmail.com'
-app.config['MAIL_PASSWORD'] = 'dgvbwzratthkvyvn'
+app.config['MAIL_USERNAME'] = 'codingprojects123123@gmail.com'
+app.config['MAIL_PASSWORD'] = 'fosrtqkmujahiorv'
 app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
 mail = Mail(app)
 
 @app.route("/" , methods = ["GET", "POST"])
 def login_user():
     email = request.form.get("Email")
     password = request.form.get("Password")
-    
     cursor.execute("SELECT Email, Password FROM user_info")
     data = cursor.fetchall()
 
@@ -52,23 +50,25 @@ def login_user():
 
 @app.route("/register_user", methods = ["GET", "POST"])
 def register_user():
-    # once they click submit send verification email to their email
-    random_token = "".join(random.choices(string.ascii_lowercase, k = 10))
-    name = request.form.get("Name")
-    email = request.form.get("Email")
-    password = request.form.get("Password")
-    
-    msg = Message("Please verify your email", sender = "jj_sasuke@hotmail.co.uk", recipients = [email])
-    msg.body = f"http://127.0.0.1:8000/verify_email?token={random_token}"
-    mail.send(msg)
-    
-    cursor.execute("INSERT INTO user_info (Name, Email, Password, Token) VALUES (%s, %s, %s, %s)",
-                  (name, email, password, random_token) )
+    if request.method == "POST":
+        # once they click submit send verification email to their email
+        random_token = "".join(random.choices(string.ascii_lowercase, k = 10))
+        name = request.form.get("Name")
+        email = request.form.get("Email")
+        password = request.form.get("Password")
         
-    db.commit()
-    
-    
+        cursor.execute("INSERT INTO user_info (Name, Email, Password, Token) VALUES (%s, %s, %s, %s)",
+                      (name, email, password, random_token) )
+
+        msg = Message("Please verify your email", sender = "codingprojects123123@gmail.com", recipients = [email]) 
+        msg.body = f"http://127.0.0.1:8000/verify_email?token={random_token}"
+        mail.send(msg)
+            
+        db.commit()
+           
     return render_template("register_user.html")
+   
+
 
 @app.route("/verify_email", methods = ["GET", "POST"])
 def email_verification():
@@ -80,12 +80,14 @@ def email_verification():
         if token[0] == extract_token_url:
             cursor.execute("UPDATE user_info SET Token = 'True' WHERE Token = %s", (extract_token_url))
             db.commit()
-            return redirect("/")
-                
+            return redirect("index.html")
+                      
+
+
         
        
     
 
 if __name__ == "__main__":
-    app.run(debug= True, port = 8000 , use_reloader = False)
+    app.run(debug= True, use_reloader = False)
 
