@@ -8,21 +8,13 @@
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
-      <h2>Login page</h2>
-      <form action = "{{url_for('login_user')}}" method = "POST">
+      <h2>Register user</h2>
+      <form action = "{{url_for('register_user')}}" method = "POST">
+          <input type = "text" placeholder = "Name" name = "Name"> </input>
           <input type = "text" placeholder = "Email" name = "Email"> </input>
           <input type = "text" placeholder = "Password" name = "Password"> </input>
           <input type = "submit" value = "Submit"> </input>
       </form>
-      <div> 
-          {% with messages = get_flashed_messages() %}
-              {% if messages %}
-                  {% for message in messages %}
-                     <li> {{message}} </li>
-                  {% endfor %}
-              {% endif %}
-          {% endwith %}
-      </div>
 	<script src="index.js"></script>
   </body>
 </html>
