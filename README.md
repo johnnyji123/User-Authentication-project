@@ -7,7 +7,7 @@
   
 ### User Registration
 * Users can register by providing a username, email, and password.
-* User details are stored in the MySQL database, including a unique token for verification.
+* User details are stored in the MySQL database, including a unique token that is generated upon registering. This token is used for verification.
 
 ### Email Verification
 * After registration, users receive a verification email containing a unique token link.
