@@ -4,7 +4,7 @@
 ### Login
 * Registered users can log in with their email and password.
 * The system checks the entered credentials against the stored information in the database.
-* 
+  
 ### User Registration
 * Users can register by providing a username, email, and password.
 * User details are stored in the MySQL database, including a unique token for verification.
