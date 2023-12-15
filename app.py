@@ -6,7 +6,7 @@ from flask_mail import Message
 import random
 import string
 
-
+# Connecting to database
 db = mysql.connector.connect(
     
         host = "localhost",
@@ -15,21 +15,22 @@ db = mysql.connector.connect(
         database = "authentication_db"
     )
 
-
+# Creating a cursor object
 cursor = db.cursor()
 
 # table user_info
-
+# Cnfiguring Mail in Flask to send email
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "123123123"
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USERNAME'] = 'codingprojects123123@gmail.com'
-app.config['MAIL_PASSWORD'] = 'fosrtqkmujahiorv'
+app.config['MAIL_PASSWORD'] = 'password'
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 mail = Mail(app)
 
+# Creating Endpoint/ function that logs in user
 @app.route("/" , methods = ["GET", "POST"])
 def login_user():
     email = request.form.get("Email")
@@ -48,8 +49,9 @@ def login_user():
     return render_template("index.html")    
  
 
+# Creating endpoint/function that allows user to register and allows user to verify email
 @app.route("/register_user", methods = ["GET", "POST"])
-def register_user():
+def register_user():    
     if request.method == "POST":
         # once they click submit send verification email to their email
         random_token = "".join(random.choices(string.ascii_lowercase, k = 10))
@@ -69,7 +71,7 @@ def register_user():
     return render_template("register_user.html")
    
 
-
+# Extract query parameter from the url and compare it to the Token column in database
 @app.route("/verify_email", methods = ["GET", "POST"])
 def email_verification():
     cursor.execute("SELECT Token FROM user_info")
