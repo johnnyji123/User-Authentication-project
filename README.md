@@ -1,4 +1,4 @@
-## Authentication Project
+## Authentication Project- Created Restful API for user authentication
 ### This project implements a basic authentication system using MySQL as the database to store user information. Users can register, log in, and receive email verification to enhance account security.
 ### Features:
 ### Login
