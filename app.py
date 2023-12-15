@@ -61,7 +61,7 @@ def register_user():
                       (name, email, password, random_token) )
 
         msg = Message("Please verify your email", sender = "codingprojects123123@gmail.com", recipients = [email]) 
-        msg.body = f"http://127.0.0.1:8000/verify_email?token={random_token}"
+        msg.body = f"http://127.0.0.1:5000/verify_email?token={random_token}"
         mail.send(msg)
             
         db.commit()
@@ -78,15 +78,12 @@ def email_verification():
     
     for token in token_data:
         if token[0] == extract_token_url:
-            cursor.execute("UPDATE user_info SET Token = 'True' WHERE Token = %s", (extract_token_url))
+            cursor.execute("UPDATE user_info SET verified_token = 'True' WHERE Token = %s", (extract_token_url,))
             db.commit()
-            return redirect("index.html")
+            return redirect("/")
                       
 
 
-        
-       
-    
 
 if __name__ == "__main__":
     app.run(debug= True, use_reloader = False)
