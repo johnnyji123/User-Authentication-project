@@ -5,13 +5,16 @@ from flask_mail import Mail
 from flask_mail import Message
 import random
 import string
+from flask_login import LoginManager, login_user, logout_user, UserMixin
+
+
 
 # Connecting to database
 db = mysql.connector.connect(
     
         host = "localhost",
-        user = "root",
-        password = "projects123123",
+        user = "user",
+        password = "password",
         database = "authentication_db"
     )
 
@@ -23,27 +26,49 @@ cursor = db.cursor()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "123123123"
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
+app.config['MAIL_PORT'] = 587   
 app.config['MAIL_USERNAME'] = 'codingprojects123123@gmail.com'
 app.config['MAIL_PASSWORD'] = 'password'
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 mail = Mail(app)
 
+login_manager = LoginManager(app)
+
+@login_manager.user_loader
+def load_user(ID):
+    cursor.execute("SELECT ID, Email, Password FROM user_info WHERE ID = %s",
+                   (ID, ))
+    
+    user = cursor.fetchone()
+    
+    return User(*user, )
+
+
+class User():
+    def __init__(self, user_id, email, password):
+        self.id = user_id
+        self.email = email
+        self.password = password
+        
+        
+    
 # Creating Endpoint/ function that logs in user
 @app.route("/" , methods = ["GET", "POST"])
-def login_user():
+def login_user_():
     email = request.form.get("Email")
     password = request.form.get("Password")
-    cursor.execute("SELECT Email, Password FROM user_info")
+    cursor.execute("SELECT ID, Email, Password FROM user_info WHERE Email = %s", (email, ))
     data = cursor.fetchall()
 
-    for x in data:
-        if email == x[0] and password == x[1]:
+    for user_details in data:
+        if email == user_details[1] and password == user_details[2]:
+            user = User(*user_details, )    
+            login_user(user)    
             flash("You have logged in successfully")
-            return render_template("logged_in.html")
+            return render_template("logged_in.html")    
         
-            
+                
     
     flash("Incorrect credentials")
     return render_template("index.html")    
@@ -84,8 +109,6 @@ def email_verification():
             db.commit()
             return redirect("/")
                       
-
-
 
 if __name__ == "__main__":
     app.run(debug= True, use_reloader = False)
